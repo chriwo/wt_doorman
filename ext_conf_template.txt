@@ -1,0 +1,11 @@
+# cat=basic//0010; type=text; label= Global check - Vars definition: Define which variables should be checked (see manual for details and possibility - only for admins)
+varsDefinition = L=int,tx_indexedsearch|sword=alphanum
+
+# cat=basic//0020; type=boolean; label= Global check - clear Vars: Clear all not defined variables in TYPO3 (could cause problems - only for admins)
+clearNotDefinedVars = 0
+
+# cat=basic//0030; type=text; label= Global check - pidInRootline: Define a PID in which the global check should work (0 let the global check works overall, -1 disables global check)
+pidInRootline = -1
+
+# cat=basic/enable/9999; type=boolean; label= All checks - debug mode: Show piVars before and after cleaning (Only for testing!)
+debug = 0
