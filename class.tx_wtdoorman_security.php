@@ -22,8 +22,6 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('wt_doorman').'class.tx_wtdoorman_removexss.php'); // load removeXSS class
-
 
 /**
  * Plugin 'doorman' for the 'wt_doorman' extension.
@@ -42,10 +40,10 @@ class tx_wtdoorman_security {
 	function sec($piVars) {
 		// config
 		$this->confArr = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['wt_doorman']); // Get backandconfig
-		$this->removeXSS = t3lib_div::makeInstance('tx_wtdoorman_RemoveXSS'); // Create new instance for removeXSS class
+		$this->removeXSS = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_wtdoorman_RemoveXSS'); // Create new instance for removeXSS class
 		
 		// let's go
-		if ($this->confArr['debug'] == 1) t3lib_div::debug($piVars, 'wt_doorman input values - '.$this->debugMessage);
+		if ($this->confArr['debug'] == 1) \TYPO3\CMS\Core\Utility\DebugUtility::debug($piVars, 'wt_doorman input values - '.$this->debugMessage);
 		if (count($piVars) > 0) { // if piVars are set
 			foreach ($piVars as $key => $value) { // one loop for every var
 				if (array_key_exists($key, $this->secParams) || array_key_exists('*', $this->secParams)) { // if current key is an allowed parameter OR there is a wildcard in first level
@@ -88,7 +86,7 @@ class tx_wtdoorman_security {
 			}
 			
 			if ($this->allow_removeXSS) $piVars = array_map(array($this->removeXSS, 'RemoveXSS'), $piVars); // removeXSS recursive for all piVars
-			if ($this->confArr['debug'] == 1) t3lib_div::debug($piVars, 'wt_doorman output values - '.$this->debugMessage);
+			if ($this->confArr['debug'] == 1) \TYPO3\CMS\Core\Utility\DebugUtility::debug($piVars, 'wt_doorman output values - '.$this->debugMessage);
 			return $piVars; // return cleaned piVars
 		} 
 	}
@@ -117,7 +115,7 @@ class tx_wtdoorman_security {
 				break;
 			
 			case (strpos(str_replace(' ', '', $method), 'alphanum++') !== false): // extended alphanum found
-				$signs = t3lib_div::trimExplode('++', $method, 1); // split to get signs for extension
+				$signs = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('++', $method, 1); // split to get signs for extension
 				$string = preg_replace('/[^\sa-zA-Z0-9'.$signs[1].']/', '', $string); // replace not allowed letters with nothing (allowed: numbers, letters and space)
 				break;
 				
@@ -125,7 +123,7 @@ class tx_wtdoorman_security {
 
 				// 1. disable XSS
 				if (method_exists('t3lib_div', 'removeXSS')) { // if removeXSS is available
-					$string = t3lib_div::removeXSS($string); // add removeXSS
+					$string = \TYPO3\CMS\Core\Utility\GeneralUtility::removeXSS($string); // add removeXSS
 				} else { // removeXSS not available (on a very old T3 version maybe)
 					$string = $this->removeXSS->RemoveXSS($string); // use own removeXSS
 				}
@@ -141,7 +139,7 @@ class tx_wtdoorman_security {
 				
 			case 'removeXSS': // change string with htmlentities
 				if (method_exists('t3lib_div', 'removeXSS')) { // if removeXSS is available
-					$string = t3lib_div::removeXSS($string); // add removeXSS
+					$string = \TYPO3\CMS\Core\Utility\GeneralUtility::removeXSS($string); // add removeXSS
 				} else { // removeXSS not available (on a very old T3 version maybe)
 					$string = $this->removeXSS->RemoveXSS($string); // use own removeXSS
 				}
@@ -149,7 +147,7 @@ class tx_wtdoorman_security {
 			
 			case (strpos($method, '"') !== false): // " found (e.g. "value1","value2")
 				$set = 0; // not found at the beginning
-				$tmp_method = t3lib_div::trimExplode(',', $method, 1); // split at ,
+				$tmp_method = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $method, 1); // split at ,
 				for ($i=0; $i < count($tmp_method); $i++) { // one loop for every method (e.g. "value1")
 					if ($string == str_replace('"', '', $tmp_method[$i])) { // if piVar == current value (without ")
 						$string = str_replace('"', '', $tmp_method[$i]); // take string from current config
